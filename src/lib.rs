@@ -42,6 +42,13 @@ impl PrivateKey {
         }
     }
 }
+impl Add<JubJubScalar> for PrivateKey {
+    type Output = PrivateKey;
+
+    fn add(self, rhs: JubJubScalar) -> PrivateKey {
+        PrivateKey(self.0 + &rhs)
+    }
+}
 
 #[derive(Default, Clone, Copy, Debug)]
 pub struct PublicKey(JubJubExtended);
@@ -64,6 +71,30 @@ impl PublicKey {
         let delta = message + s;
 
         Cypher { gamma, delta }
+    }
+}
+impl Mul<JubJubScalar> for PublicKey {
+    type Output = PublicKey;
+
+    fn mul(self, rhs: JubJubScalar) -> PublicKey {
+        PublicKey(self.0 * &rhs)
+    }
+}
+impl MulAssign<JubJubScalar> for PublicKey {
+    fn mul_assign(&mut self, rhs: JubJubScalar) {
+        *self = *self * rhs;
+    }
+}
+impl Add<JubJubExtended> for PublicKey {
+    type Output = PublicKey;
+
+    fn add(self, rhs: JubJubExtended) -> PublicKey {
+        PublicKey(self.0 + rhs)
+    }
+}
+impl AddAssign<JubJubExtended> for PublicKey {
+    fn add_assign(&mut self, rhs: JubJubExtended) {
+        *self = *self + rhs;
     }
 }
 

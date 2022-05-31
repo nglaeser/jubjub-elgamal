@@ -1,5 +1,6 @@
+# Key-Updataable Jubjub ElGamal
+> **This is a fork of [dusk-network/ElGamal](https://github.com/dusk-network/ElGamal)** which adds _key-updatability_.
 
-# ElGamal
 Implementation of the ElGamal encryption scheme
 for the JubJub curve group. This scheme is intended 
 to encrypt two BlsScalars, as a message, inside the same 
