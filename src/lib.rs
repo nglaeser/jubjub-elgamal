@@ -49,9 +49,16 @@ impl Add<JubJubScalar> for PrivateKey {
         PrivateKey(self.0 + &rhs)
     }
 }
+impl Mul<JubJubScalar> for PrivateKey {
+    type Output = PrivateKey;
+
+    fn mul(self, rhs: JubJubScalar) -> PrivateKey {
+        PrivateKey(self.0 * &rhs)
+    }
+}
 
 #[derive(Default, Clone, Copy, Debug)]
-pub struct PublicKey(JubJubExtended);
+pub struct PublicKey(pub JubJubExtended);
 
 impl From<PrivateKey> for PublicKey {
     fn from(private: PrivateKey) -> Self {
