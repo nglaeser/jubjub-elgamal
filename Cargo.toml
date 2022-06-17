@@ -10,12 +10,13 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-dusk-plonk = "0.3.5"
-rand = "0.7.0"
+dusk-jubjub = "0.10"
+dusk-bytes = "0.1.5"
+rand_core = "0.6.3"
 thiserror = "1.0"
 
 [build-dependencies]
-dusk-plonk = "0.3.5"
+dusk-jubjub = "0.10"
 
 [dependencies.subtle]
 version = "^2.2.1"

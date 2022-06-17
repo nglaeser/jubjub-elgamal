@@ -8,8 +8,9 @@ mod error;
 
 use crate::error::Error;
 use core::ops::{Add, AddAssign, Mul, MulAssign, Sub, SubAssign};
-use dusk_plonk::jubjub::{JubJubAffine, JubJubExtended, JubJubScalar, GENERATOR_EXTENDED};
-use rand::{CryptoRng, Rng};
+use dusk_bytes::Serializable;
+use dusk_jubjub::{JubJubAffine, JubJubExtended, JubJubScalar, GENERATOR_EXTENDED};
+use rand_core::{CryptoRng, RngCore};
 use std::io;
 use std::io::{Read, Write};
 
@@ -22,7 +23,7 @@ impl PrivateKey {
     /// of the Field JubJubScalar.
     pub fn new<T>(rand: &mut T) -> PrivateKey
     where
-        T: Rng + CryptoRng,
+        T: RngCore + CryptoRng,
     {
         let fr = JubJubScalar::random(rand);
 
@@ -36,8 +37,8 @@ impl PrivateKey {
     }
 
     pub fn from_bytes(bytes: &[u8; 32]) -> Result<Self, Error> {
-        match Option::from(JubJubScalar::from_bytes(bytes)) {
-            Some(scalar) => Ok(PrivateKey(scalar)),
+        match JubJubScalar::from_bytes(bytes) {
+            Ok(scalar) => Ok(PrivateKey(scalar)),
             _ => Err(Error::SerialisationError),
         }
     }
@@ -143,18 +144,16 @@ impl Cypher {
         let mut delta_buf = [0u8; 32];
         delta_buf.copy_from_slice(&buf[32..]);
 
-        let gamma_a = JubJubAffine::from_bytes(gamma_buf);
-        if gamma_a.is_none().unwrap_u8() == 1 {
+        let gamma_a = JubJubAffine::from_bytes(&gamma_buf);
+        if gamma_a.is_err() {
             return Err(Error::InvalidData);
         }
-
         let gamma = JubJubExtended::from(gamma_a.unwrap());
 
-        let delta_a = JubJubAffine::from_bytes(delta_buf);
-        if delta_a.is_none().unwrap_u8() == 1 {
+        let delta_a = JubJubAffine::from_bytes(&delta_buf);
+        if delta_a.is_err() {
             return Err(Error::InvalidData);
         }
-
         let delta = JubJubExtended::from(delta_a.unwrap());
 
         let cypher = Cypher {
@@ -199,8 +198,8 @@ impl Write for Cypher {
         n += 32;
         let mut gamma_arr = [0u8; 32];
         gamma_arr.copy_from_slice(&gamma_buf);
-        let gamma = JubJubAffine::from_bytes(gamma_arr);
-        if gamma.is_none().unwrap_u8() == 1 {
+        let gamma = JubJubAffine::from_bytes(&gamma_arr);
+        if gamma.is_err() {
             return Err(Error::Generic.into());
         }
 
@@ -212,8 +211,8 @@ impl Write for Cypher {
         n += 32;
         let mut delta_arr = [0u8; 32];
         delta_arr.copy_from_slice(&delta_buf);
-        let delta = JubJubAffine::from_bytes(delta_arr);
-        if delta.is_none().unwrap_u8() == 1 {
+        let delta = JubJubAffine::from_bytes(&delta_arr);
+        if delta.is_err() {
             return Err(Error::Generic.into());
         }
 
